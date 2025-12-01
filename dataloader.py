@@ -21,9 +21,12 @@ class MNIST_Dataloader(data.Dataset) :
 
     def __getitem__(self, idx):                
         iname = self.inames[idx]         
+        cls = self.icls[idx]
         image = PIL.Image.open(iname)    
         image = np.array(image, dtype = np.float32) / 255.0
-        return image
+        image = image - 0.5 
+        image = np.stack([image, image, image])
+        return (1-image, cls)
     
     def __len__(self):
         return len(self.inames)
