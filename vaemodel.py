@@ -111,7 +111,7 @@ class VAE(torch.nn.Module) :
             last_loss = 0.
             for i, data in enumerate(tr_dataset):
                 # every data instance is an input + label pair
-                inputs = data                                
+                inputs = data[0]                                
                 if next(self.parameters()).is_cuda :
                     inputs  = inputs.to(device)                    
                 # set your gradients to zero for every batch
@@ -123,7 +123,7 @@ class VAE(torch.nn.Module) :
                 #r_loss = reconstruction_loss(inputs, outputs)
                 r_loss = self.bce_loss(inputs, outputs)
                 kl_l = self.kl_loss(mu, sigma) 
-                loss = torch.mean(r_loss) + torch.mean(kl_l)
+                loss = torch.mean(r_loss) + 1e-4*torch.mean(kl_l)
                 #compute gradientes using backpropagation
                 loss.backward()
                 # adjust learning weights
@@ -150,7 +150,7 @@ class VAE(torch.nn.Module) :
             # disable gradient computation and reduce memory consumption.
             with torch.no_grad():
                 for i, vdata in enumerate(val_dataset):
-                    vinputs = vdata                    
+                    vinputs = vdata[0]                    
                     if next(self.parameters()).is_cuda :
                         vinputs  = vinputs.to(device)                        
                         
@@ -174,7 +174,7 @@ class VAE(torch.nn.Module) :
 
     #eval
     def predict(self, inputs) :
-        inputs = torch.Tensor.unsqueeze(inputs, dim = 1)
+        #inputs = torch.Tensor.unsqueeze(inputs, dim = 1)
         pred = self(inputs)
         return pred
     

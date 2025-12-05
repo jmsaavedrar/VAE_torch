@@ -6,6 +6,21 @@ import numpy as np
 import os
 import PIL
 
+def read_image(filename) :
+    image = PIL.Image.open(filename)    
+    image = image.resize((32,32))
+    image = np.array(image, dtype = np.float32) / 255.0
+    #image = image - 0.5 
+    image = np.stack([image])    
+    #image = np.stack([image, image, image])
+    return image
+
+def rever_trans(pred) :
+    #image = pred + 0.5
+    image = pred * 255.0
+    image = np.astype(image, np.uint8)
+    return image
+
 class MNIST_Dataloader(data.Dataset) :
     def __init__(self, datadir, datatype = 'train'):
         assert datatype in ['train', 'valid']
@@ -23,9 +38,10 @@ class MNIST_Dataloader(data.Dataset) :
         iname = self.inames[idx]         
         cls = self.icls[idx]
         image = PIL.Image.open(iname)    
+        image = image.resize((32,32))
         image = np.array(image, dtype = np.float32) / 255.0
-        image = image - 0.5 
-        image = np.stack([image, image, image])
+        #image = image - 0.5 
+        image = np.stack([image])
         return (1-image, cls)
     
     def __len__(self):
